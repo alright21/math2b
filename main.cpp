@@ -9,13 +9,17 @@ struct planet {
   int id;
   vector<int> tanks;
   vector<int> neigh;
+  bool visited;
 };
 
 void solve();
+bool routeAvailable(int p);
 
 int n_planets;
 int fuel;
 int n_tanks;
+
+set<int> visited;
 
 std::vector<int> tanks;
 
@@ -60,6 +64,8 @@ int main() {
     planets[dst].neigh[src] = fuel_consumed;
   }
 
+  planets[0].visited = true;
+  std::vector<bool> visited(n_planets, false);
   solve();
 
   return 0;
@@ -67,7 +73,6 @@ int main() {
 
 void solve() {
   planet position = planets[0];
-  set<int> visited;
   visited.insert(0);
 
   while (fuel > 0) {
@@ -90,12 +95,12 @@ void solve() {
         for (int j = 0; j < n_tanks; j++) {
           total_reward += planets[position.neigh[i]].tanks[j];
         }
-        if (total_reward > highest_reward) {
+        if (total_reward > highest_reward &&
+            routeAvailable(position.neigh[i])) {
           highest_reward = total_reward;
           highest_reward_planet = planets[i];
           trip_cost = position.neigh[i];
         }
-        cout << total_reward << endl;
       }
     }
 
@@ -104,5 +109,21 @@ void solve() {
     position = highest_reward_planet;
     fuel -= trip_cost;
     visited.insert(position.id);
+    cout << fuel << endl;
+    if (position.id == -1) {
+      return;
+    }
   }
 }
+
+bool routeAvailable(int p) {
+  for (int neighbour : planets[p].neigh) {
+    if (visited.find(neighbour) == visited.end()) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+bool route5Available(int p) {}
