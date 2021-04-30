@@ -71,7 +71,6 @@ void solve() {
   visited.insert(0);
 
   while (fuel > 0) {
-    cout << "planet: " << position.id << ", fuel: " << fuel << endl;
     for (int i = 0; i < n_tanks; ++i) {
       int waste_taken =
           tanks[i] > position.tanks[i] ? position.tanks[i] : tanks[i];
@@ -80,27 +79,30 @@ void solve() {
       out << waste_taken << " " << i << " ";
     }
 
-    planet cheapest_planet;
-    cheapest_planet.id = -1;
-    int cheapest_trip = INT32_MAX;
-
+    planet highest_reward_planet;
+    highest_reward_planet.id = -1;
+    int trip_cost = INT32_MAX;
+    int highest_reward = -1;
     for (int i = 0; i < n_planets; ++i) {
-      if (position.neigh[i] > 0 && position.neigh[i] < cheapest_trip &&
-          visited.find(i) == visited.end()) {
-        cheapest_planet = planets[i];
-        cheapest_trip = position.neigh[i];
+      int total_reward = 0;
+
+      if (position.neigh[i] > 0 && visited.find(i) == visited.end()) {
+        for (int j = 0; j < n_tanks; j++) {
+          total_reward += planets[position.neigh[i]].tanks[j];
+        }
+        if (total_reward > highest_reward) {
+          highest_reward = total_reward;
+          highest_reward_planet = planets[i];
+          trip_cost = position.neigh[i];
+        }
+        cout << total_reward << endl;
       }
     }
 
-    out << cheapest_planet.id << endl;
+    out << highest_reward_planet.id << endl;
 
-    position = cheapest_planet;
-    fuel -= cheapest_trip;
+    position = highest_reward_planet;
+    fuel -= trip_cost;
     visited.insert(position.id);
-
-    for (int a : visited) {
-      cout << a << " ";
-    }
-    cout << endl;
   }
 }
